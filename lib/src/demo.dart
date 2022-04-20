@@ -1,25 +1,42 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:teste_api_sqllite/src/errorPage/error.dart';
+import 'package:teste_api_sqllite/src/model/weather_model.dart';
 import 'package:teste_api_sqllite/src/repository/weather_repository.dart';
 
 class Demo extends StatefulWidget {
+  Demo({Key? key,  required this.text}): super (key: key);
+  //PASSA A ENTRADA DA CIDADE AQUI
+  final String text;
   @override
-  State<Demo> createState() => _DemoState();
+  State<Demo> createState() => _DemoState(text: this.text);
 }
 class _DemoState extends State<Demo> {
+_DemoState({Key? key,  required this.text});
+   final String text;
+
+   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(centerTitle: true,
         title:  const Text('Cuiaba Mil Grau'),
       ),
-      //DESIGN UI DA APLICAÇÃO
-      body: Center(
-        child: Column(
+      //PEGA A APLICAÇÃO EM UM FutureBuilder
+      body:FutureBuilder<List<Weather>>(
+        future: Repository().obterTodos(uri: text),
+        builder: (context, snapshot){
+          
+          //SE API RETORAR ALGUM DADO
+          if(snapshot.hasData){
+            return Center(
+        child: ListView.builder(itemBuilder: (context, index){
+
+          return Column(
           children: [
-              _buildText('City Name',60,Colors.black,true),
+              _buildText(widget.text.toUpperCase(),60,Colors.black,true),
               _buildText('Today',40,Colors.grey,false),
-              _buildText('data',20 ,Colors.black,false),
+              _buildText(snapshot.data![index].description,20 ,Colors.black,false),
               SizedBox(
                 height: 150,
                 child: Row(
@@ -27,11 +44,11 @@ class _DemoState extends State<Demo> {
                   children: <Widget>[
                     _buildDisplayCard(
                       Icons.thermostat, 
-                      '29 ºC', 
+                      snapshot.data![index].temperature, //MOSTRA A TEMPERATURA AQUI
                       Colors.red),
                      _buildDisplayCard(
                       Icons.air, 
-                      '1 KM/H', 
+                      snapshot.data![index].wind, 
                       Colors.blue),
                   ],
                 ),
@@ -52,17 +69,50 @@ class _DemoState extends State<Demo> {
                         FittedBox(
                           child:_buildText('Forecast for Tomorrow',20,Colors.black,true),
                         ),
-                        SizedBox(height: 20,)
+                        SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(padding: const EdgeInsets.all(5),
+                            child: Icon(Icons.thermostat,
+                            size: 30,
+                              ),
+                            ),
+                            // MOSTRA O DUA 1 DA TEMPERATURA NO Forecast
+                            Padding(padding: const EdgeInsets.all(5),
+                            child: _buildText(snapshot.data![index].forecast![index].temperature.toString(), 20, Colors.white, true ),
+                            ),
+                             Padding(padding: const EdgeInsets.all(5),
+                            child: Icon(Icons.air,
+                            size: 30,
+                              ),
+                            ),
+                            // MOSTRA O DUA 1 DO VENTO NO Forecast
+                            Padding(padding: const EdgeInsets.all(5),
+                            child: _buildText(snapshot.data![index].forecast![index].wind.toString(), 20, Colors.white, true ),
+                            ), 
+                          ],
+                        ),
                       ],
                     ),
                   )
                 ),
               ),
             ],
-          ),
-        )
-      );
-    }
+          );
+        }) 
+        );
+        } else if(snapshot.hasError){
+          return ErrorPage();
+        }else{
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    ),
+  );
+}
   // CONSTRUÇÃO DE UMA NOVO MÉTODO PARA A EXIBIÇÃO WEATHER
   Container _buildDisplayCard(IconData icon, String? result, Color iconColor){
     return Container(

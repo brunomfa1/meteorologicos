@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 //CLASSE DA API
 
 //CLASSE WEATHER
@@ -9,28 +11,29 @@ class Weather {
 
   Weather({this.temperature, this.wind, this.description, this.forecast});
 
-  Weather.fromJson(Map<String, dynamic> json) {
-    temperature = json['temperature'];
-    wind = json['wind'];
-    description = json['description'];
-    if (json['forecast'] != null) {
-      forecast = <Forecast>[];
-      json['forecast'].forEach((v) {
-        forecast!.add(new Forecast.fromJson(v));
-      });
-    }
+  
+
+  Map<String, dynamic> toMap() {
+     return {
+    'temperature': temperature,
+    'wind': wind,
+    'description': description,
+    'forecast': forecast!.map((x) => x.toMap()).toList()
+    };
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['temperature'] = this.temperature;
-    data['wind'] = this.wind;
-    data['description'] = this.description;
-    if (this.forecast != null) {
-      data['forecast'] = this.forecast!.map((v) => v.toJson()).toList();
-    }
-    return data;
+  factory Weather.fromMap(Map<String, dynamic> map) {
+    return Weather(
+      temperature: map['temperature'],
+      wind: map['wind'],
+      description: map['description'],
+      forecast: map['forecast'] != null ? List<Forecast>.from(map['forecast']?.map((x) => Forecast.fromMap(x))) : null,
+    );
   }
+
+  String toJson() => json.encode(toMap());
+
+  factory Weather.fromJson(String source) => Weather.fromMap(json.decode(source));
 }
 
 //CLASSE FORECAST
@@ -41,17 +44,26 @@ class Forecast {
 
   Forecast({this.day, this.temperature, this.wind});
 
-  Forecast.fromJson(Map<String, dynamic> json) {
-    day = json['day'];
-    temperature = json['temperature'];
-    wind = json['wind'];
+
+
+  Map<String, dynamic> toMap() {
+   
+    return {
+      'day': day,
+      'temperature': temperature,
+      'wind': wind
+    };
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['day'] = this.day;
-    data['temperature'] = this.temperature;
-    data['wind'] = this.wind;
-    return data;
+  factory Forecast.fromMap(Map<String, dynamic> map) {
+    return Forecast(
+      day: map['day'],
+      temperature: map['temperature'],
+      wind: map['wind'],
+    );
   }
+
+  String toJson() => json.encode(toMap());
+
+  factory Forecast.fromJson(String source) => Forecast.fromMap(json.decode(source));
 }

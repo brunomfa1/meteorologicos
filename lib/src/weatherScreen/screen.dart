@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:teste_api_sqllite/src/demo.dart';
 import 'package:teste_api_sqllite/src/model/weather_Model.dart';
 
 
@@ -57,6 +58,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.search),
         onPressed: (){
+          setState(() {
+          text = _controller.text;
+          Navigator.of(context).push(MaterialPageRoute(builder:(_) => 
+          //PASSA O NOME DA CIDADE PARA A CHAMADA DA API
+          Demo(text: text,)));   
+          }); 
+          _controller.clear();//APAGA O INPUT DA CIDADE APÓS A INSERÇÃO      
         },
       ),
     );

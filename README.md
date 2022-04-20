@@ -1,2 +1,2 @@
 # teste_api_sqllite
-App em flutter meteorológicos, meramente para estudo
+App em flutter controle de tempo, meramente para estudo

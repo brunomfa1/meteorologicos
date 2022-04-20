@@ -15,22 +15,24 @@ class _DemoState extends State<Demo> {
 _DemoState({Key? key,  required this.text});
    final String text;
 
-   
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(centerTitle: true,
+PreferredSizeWidget appBar(){
+
+return  AppBar(centerTitle: true,
         title:  const Text('Cuiaba Mil Grau'),
-      ),
-      //PEGA A APLICAÇÃO EM UM FutureBuilder
-      body:FutureBuilder<List<Weather>>(
+      );
+}
+
+Widget body(){
+  return 
+      FutureBuilder<List<Weather>>(
         future: Repository().obterTodos(uri: text),
         builder: (context, snapshot){
           
           //SE API RETORAR ALGUM DADO
           if(snapshot.hasData){
             return Center(
-        child: ListView.builder(itemBuilder: (context, index){
+        child: ListView.builder( itemCount:snapshot.data!.length,
+          itemBuilder: (context, index){
 
           return Column(
           children: [
@@ -90,7 +92,53 @@ _DemoState({Key? key,  required this.text});
                             // MOSTRA O DUA 1 DO VENTO NO Forecast
                             Padding(padding: const EdgeInsets.all(5),
                             child: _buildText(snapshot.data![index].forecast![index].wind.toString(), 20, Colors.white, true ),
-                            ), 
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ),
+              ),
+              Container(
+                child: Card(
+                  color: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        FittedBox(
+                          child:_buildText('Forecast after tomorrow',20,Colors.black,true),
+                        ),
+                        SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(padding: const EdgeInsets.all(5),
+                            child: Icon(Icons.thermostat,
+                            size: 30,
+                              ),
+                            ),
+                            // MOSTRA O DUA 1 DA TEMPERATURA NO Forecast
+                            Padding(padding: const EdgeInsets.all(5),
+                            child: _buildText(snapshot.data![index].forecast![index+1].temperature.toString(), 20, Colors.white, true ),
+                            ),
+                             Padding(padding: const EdgeInsets.all(5),
+                            child: Icon(Icons.air,
+                            size: 30,
+                              ),
+                            ),
+                            // MOSTRA O DUA 1 DO VENTO NO Forecast
+                            Padding(padding: const EdgeInsets.all(5),
+                            child: _buildText(snapshot.data![index].forecast![index+1].wind.toString(), 20, Colors.white, true ),
+                            ),
+                             SizedBox(
+                                height: 30,
+                            ),
+                             
                           ],
                         ),
                       ],
@@ -106,12 +154,20 @@ _DemoState({Key? key,  required this.text});
           return ErrorPage();
         }else{
           return Center(
-            child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
           );
         }
       },
-    ),
-  );
+    );
+}
+   
+  @override
+  Widget build(BuildContext context) {
+    return  Scaffold(
+        appBar:appBar(),
+        body: body(),
+
+    );
 }
   // CONSTRUÇÃO DE UMA NOVO MÉTODO PARA A EXIBIÇÃO WEATHER
   Container _buildDisplayCard(IconData icon, String? result, Color iconColor){
